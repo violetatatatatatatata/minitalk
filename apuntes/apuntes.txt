@@ -1,0 +1,42 @@
+/***	MINITALK	***/
+
+Funciones:
+	◦ ft_printf
+	◦ signal: es mas seguro usar sigaction
+	◦ sigemptyset
+	◦ sigaddset
+	◦ sigaction
+	◦ kill (int pid, int signal)
+		Envía una señal a proceso especificado con pid. Si pid = 0 señal es enviada a todos los procesos, excepto los procesos de sistema. Si valor de retorno == 0 llamado es exitoso sino error retorna en errno
+	◦ getpid
+	◦ malloc
+	◦ free
+	◦ pause
+	◦ sleep
+	◦ usleep
+	◦ exit
+
+Señales: SIGUSR1 () y SIGUSR2
+
+	-	El servidor debe lanzarse primero y mostar su PID
+
+/*	CLIENT	*/
+	- Recibe como parametros el PID y el string. Este string ha de enviarse al servidor
+
+/*	SERVER	*/
+	- Muestra el string recibido
+	- Envia ACK en caso de que se haya recibido
+
+Señales en UNIX:
+	Una señal son mensajes enviados por el SO al proceso para notificar un proceso.
+	Son asincronas (el proceso no sabe con anticipacion que el evento ocurrira)
+	Permiten terminar o cancelar procesos para atender una excepcion
+
+	Manejador de eventos: es el proceso que permite ejecutar el evento que interrumpe, es decir, atender al evento. Un proceso puede especificar un manejador de señales para ser invocado cuando se recibe una señal. Cuando un manejador es invocado para recibir una señal, se dice que atiende la señal. Un proceso puede realizar las siguientes acciones cuando recibe la señal:
+
+-          Proceso puede realizar acción por defecto
+-          Proceso puede bloquear la señal (algunas pueden ignorarse)
+-          Proceso puede atender señal con un manejador
+
+Manejadores usualmente se ejecutan en el stack del proceso, lo cual implica que el manejador retorna al punto en que la ejecución fue interrumpida.
+

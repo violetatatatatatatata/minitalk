@@ -1,0 +1,8 @@
+    -   El servidor debe lanzarse primero y mostar su PID
+
+/*  CLIENT  */
+    - Recibe como parametros el PID y el string. Este string ha de enviarse al servidor
+
+/*  SERVER  */
+    - Muestra el string recibido
+    - Envia ACK en caso de que se haya recibido

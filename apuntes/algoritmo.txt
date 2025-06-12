@@ -6,3 +6,10 @@
 /*  SERVER  */
     - Muestra el string recibido
     - Envia ACK en caso de que se haya recibido
+
+PROTOCOLOS
+	ARQ / S&W
+
+HANDLER	- NRZ-I (inverted non return to zero)
+	SIGUSR1 -> bit 1 (up)
+	SIGURS2 -> bit 0 (down)

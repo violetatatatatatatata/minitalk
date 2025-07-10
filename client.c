@@ -6,7 +6,7 @@
 /*   By: avelandr <avelandr@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/07 21:43:56 by avelandr          #+#    #+#             */
-/*   Updated: 2025/07/08 01:28:29 by avelandr         ###   ########.fr       */
+/*   Updated: 2025/07/10 15:57:50 by avelandr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,8 @@
 	client keeps going on
 	- Server undestands the character sent, and replies with the number of
 	bits sent using SIGUSR1, SIGUSR2
+
+	Protocolo asincrono
 */
 
 int	main(int argc, char **argv)
@@ -35,6 +37,10 @@ int	main(int argc, char **argv)
 	server = ft_atoi(argv[1]);
 	message = argv[2];
 
+	Signal(SIGUSR1, ack_handler, false);
+    Signal(SIGUSR1, end _handler, false);
+
+	// send the char bit by bit
 	while (*message)
 		send_char(*message++, server);
 	send_char('\0', server);
@@ -48,9 +54,25 @@ void    send_char(char c, pid_t server)
 	bit = 0;
 	while (bit < CHAR_BIT)	// Number of bits in a byte (8)
 	// BITWISE OPERATIONS	(search it lol)
-	if (c & (0b00100000 >> bit))
+	if (c & (0x80 >> bit))
 		Kill(server, SIGUSR1);
 	else
 		Kill(server, SIGUSR2);
 	++bit;
+
+	// stop while hes listening
+	while (g_server == BUSY)
+		usleep(42);
+	g_server = BUSY;
+}
+
+void    ack_handler(int signo)
+{
+	g_server = READY;
+}
+
+void	end_handler(int signo)
+{
+	write(STDOUT_FILENO, "Ok!", 3);
+	exit(EXIT_SUCCESS);
 }

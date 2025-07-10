@@ -6,7 +6,7 @@
 /*   By: avelandr <avelandr@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/08 00:20:43 by avelandr          #+#    #+#             */
-/*   Updated: 2025/07/08 02:06:07 by avelandr         ###   ########.fr       */
+/*   Updated: 2025/07/10 16:03:37 by avelandr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,7 @@ void Signal (int signo, void *handler, bool use_siginfo)
 
 	// block SIGUSR1 while pricessing SIGUSR2 and viceversa CSMA
 	sigemptyset(&sa.sa_mask);
+	// theyre not actually neccesary
 	sigaddset(&sa.sa_mask, SIGUSR1);
 	sigaddset(&sa.sa_mask, SIGUSR2);
 

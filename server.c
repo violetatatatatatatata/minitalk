@@ -6,17 +6,11 @@
 /*   By: avelandr <avelandr@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/12 17:07:47 by avelandr          #+#    #+#             */
-/*   Updated: 2025/07/10 15:59:46 by avelandr         ###   ########.fr       */
+/*   Updated: 2025/07/11 19:38:27 by avelandr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minitalk.h"
-
-/*
- *
- *
- *
- */
 
 /*
 typedef struct {
@@ -45,6 +39,10 @@ void	handler(int signo, siginfo_t *info, void *more_info)
 	static int		bit;
 	static pid_t	goku;
 
+    c = 0;
+    bit = 0;
+    goku = 0;
+
 	// SIGINFO PID
 	if (info->si_pid)
 		goku = info->si_pid;
@@ -59,26 +57,31 @@ void	handler(int signo, siginfo_t *info, void *more_info)
 	if (CHAR_BIT == bit)
 	{
 		bit = 0;
-		if ('\0' == 0)
+		if ('\0' == c)
 		{	// write is async signal safe
 			write (STDOUT_FILENO, "\n", 1);
 			Kill(pif_t, int);
+            c = 0;
 			return ; //everythings ok
 		}
 		write(STDOUT_FILENO, &c, 1);
+        c = 0;
 	}
+    Kill(client, SIGUSR1);
 }
 
-int main(void)
+int main(int argc, char **argv)
 {
-	ft_printf("El PID es: %d\n", getpid());
-
+	if (ac != 1)
+	{
+		fputs("Usage: ./server\n", stderr);
+		return (EXIT_FAILURE);
+	}
+    ft_printf("Server PID: %d\n", getpid());
 	// Wrapper function (funcion que llama a otra funcion)
 	Signal(SIGUSR1, handler, true);
 	Signal(SIGUSR2, handler, true);
-
 	while (1337)
 		pause();
-
-	return EXIT_SUCCESS;
+	return (EXIT_SUCCESS);
 }

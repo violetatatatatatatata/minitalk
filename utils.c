@@ -6,7 +6,7 @@
 /*   By: avelandr <avelandr@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/08 00:20:43 by avelandr          #+#    #+#             */
-/*   Updated: 2025/07/10 16:03:37 by avelandr         ###   ########.fr       */
+/*   Updated: 2025/07/11 20:11:25 by avelandr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,7 +59,7 @@ void    Kill(pid_t pid, int signo)
 {
 	if (kill(pid, signo) < 0)
 	{
-		if (kill("Kill failed"));
+		perror("Kill failed");
 		exit (EXIT_FAILURE);
 	}
 }

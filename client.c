@@ -6,7 +6,7 @@
 /*   By: avelandr <avelandr@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/07 21:43:56 by avelandr          #+#    #+#             */
-/*   Updated: 2025/07/11 20:17:18 by avelandr         ###   ########.fr       */
+/*   Updated: 2025/07/14 17:44:15 by avelandr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,11 +75,13 @@ void    send_char(char c, pid_t server)
 
 void    ack_handler(int signo)
 {
+	(void)signo;
 	g_server = READY;
 }
 
 void	end_handler(int signo)
 {
+	(void)signo;
 	write(1, "ACK\n", 4);
 	exit(EXIT_SUCCESS);
 }

@@ -6,7 +6,7 @@
 /*   By: avelandr <avelandr@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/12 17:07:47 by avelandr          #+#    #+#             */
-/*   Updated: 2025/07/11 19:38:27 by avelandr         ###   ########.fr       */
+/*   Updated: 2025/07/14 18:17:31 by avelandr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,32 +35,28 @@ void	handler(int signo, siginfo_t *info, void *more_info)
 	(void)more_info;
 
 	// write(STDOUT_FILENO, "hello", 5);
-	static char		c;		// we want to save it between statements
-	static int		bit;
-	static pid_t	goku;
-
-    c = 0;
-    bit = 0;
-    goku = 0;
+	static char		c = 0;		// we want to save it between statements
+	static int		bit = 0;
+	static pid_t	client = 0;
 
 	// SIGINFO PID
-	if (info->si_pid)
-		goku = info->si_pid;
+	if (client == 0 && info->si_pid)
+		client = info->si_pid;
 	// decoder!!
 	if (SIGUSR1 == signo)
 		c = c | (0b10000000 >> bit); // operador or !!! 
 		//  c |= (0b10000000 >> bit)
-	else if (SIGURS2 == signo)
-		c &= ~(0b10000000 >> bit);		// ?????? how df this owrks
-
+	else if (SIGUSR2 == signo)
+		c &= ~(0x80 >> bit);		// ?????? how df this owrks
+	bit++;
 	// once the char is recieved, print it and tell client send another
 	if (CHAR_BIT == bit)
 	{
 		bit = 0;
-		if ('\0' == c)
+		if (c == '\0')
 		{	// write is async signal safe
 			write (STDOUT_FILENO, "\n", 1);
-			Kill(pif_t, int);
+			Kill(client, SIGUSR2);
             c = 0;
 			return ; //everythings ok
 		}
@@ -72,7 +68,7 @@ void	handler(int signo, siginfo_t *info, void *more_info)
 
 int main(int argc, char **argv)
 {
-	if (ac != 1)
+	if (argc != 1)
 	{
 		fputs("Usage: ./server\n", stderr);
 		return (EXIT_FAILURE);
@@ -81,6 +77,7 @@ int main(int argc, char **argv)
 	// Wrapper function (funcion que llama a otra funcion)
 	Signal(SIGUSR1, handler, true);
 	Signal(SIGUSR2, handler, true);
+	(void)argv[0];
 	while (1337)
 		pause();
 	return (EXIT_SUCCESS);

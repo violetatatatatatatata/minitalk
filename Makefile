@@ -6,7 +6,7 @@
 #    By: avelandr <avelandr@student.42barcelon      +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/07/07 21:55:54 by avelandr          #+#    #+#              #
-#    Updated: 2025/07/07 22:06:32 by avelandr         ###   ########.fr        #
+#    Updated: 2025/07/24 19:56:56 by avelandr         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -34,7 +34,7 @@ OBJS_SERVER = $(SRCS_SERVER:.c=.o)
 OBJS_CLIENT = $(SRCS_CLIENT:.c=.o)
 
 CC = cc
-CFLAGS = -Wall -Wextra -Werror
+CFLAGS = -Wall -Wextra -Werror -g -O0
 
 all: $(LIBFT_LIB) $(NAME_SERVER) $(NAME_CLIENT)
 

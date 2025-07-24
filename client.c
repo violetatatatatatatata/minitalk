@@ -6,7 +6,7 @@
 /*   By: avelandr <avelandr@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/07 21:43:56 by avelandr          #+#    #+#             */
-/*   Updated: 2025/07/14 17:44:15 by avelandr         ###   ########.fr       */
+/*   Updated: 2025/07/24 21:53:46 by avelandr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,7 @@ int	main(int argc, char **argv)
 	message = argv[2];
 
 	Signal(SIGUSR1, ack_handler, false);
-    Signal(SIGUSR1, end_handler, false);
+    Signal(SIGUSR2, end_handler, false);
 
     i = 0;
 	// send the char bit by bit
@@ -55,22 +55,25 @@ int	main(int argc, char **argv)
 	return (EXIT_SUCCESS);
 }
 
+/*  Envía los bits del least significant bit al most significant a través de de SIGSR1 (1) or SIGUSR2 to 0.
+ */
 void    send_char(char c, pid_t server)
 {
 	int	bit;
 
 	bit = 0;
 	while (bit < CHAR_BIT)	// Number of bits in a byte (8)
-	// BITWISE OPERATIONS	(search it lol)
-	if (c & (0x80 >> bit))
-		Kill(server, SIGUSR1);
-	else
-		Kill(server, SIGUSR2);
-	bit++;
-	// stop while hes listening
-	while (g_server == BUSY)
-		usleep(42);
-	g_server = BUSY;
+	{
+        if (c & (0x80 >> bit))  // BITWISE OPERATION !!!!!
+	    	Kill(server, SIGUSR1);
+	    else
+	    	Kill(server, SIGUSR2);
+	    bit++;
+	// stop while hes listening, espera el ACK mientras handler se ejecuta
+	    while (g_server == BUSY)
+	    	usleep(42);
+	    g_server = BUSY;
+    }
 }
 
 void    ack_handler(int signo)

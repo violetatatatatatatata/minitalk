@@ -6,7 +6,7 @@
 /*   By: avelandr <avelandr@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/12 17:13:06 by avelandr          #+#    #+#             */
-/*   Updated: 2025/07/24 22:59:04 by avelandr         ###   ########.fr       */
+/*   Updated: 2025/07/28 19:26:18 by avelandr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,10 +14,10 @@
 # define MINITALK_H
 
 // Protocolo de Stop and Wait
-#define BUSY 0
-#define READY 1
+# define BUSY 0
+# define READY 1
 
-#define MAX_PID 10
+# define MAX_PID 10
 
 #include "libft/Includes/libft.h"
 # include <stdio.h>
@@ -47,11 +47,11 @@
 	// mask is used for blocking signals
 
 // Functions
-void	Signal (int signo, void *handler, bool use_siginfo);
-void	Kill(pid_t pid, int signo);
+void	signal(int signo, void *handler, bool use_siginfo);
+void	kill(pid_t pid, int signo);
 void	send_char(char c, pid_t server);
 void	ack_handler(int signo);
-void    end_handler(int signo);
+void	end_handler(int signo);
 void	handler(int signo, siginfo_t *info, void *more_info);
 
 #endif

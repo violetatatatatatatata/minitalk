@@ -1,5 +1,5 @@
 # Minitalk
-**Minitalk** es un proyecto cuyo propósito es crear un pequeño programa de intercambio de datos utilizando señales UNIX.
+Este es un proyecto cuyo propósito es crear un pequeño programa de intercambio de datos utilizando señales UNIX.
 
 ## Funcionalidad
 
@@ -10,7 +10,6 @@ El proyecto se compone de dos programas: un cliente y un servidor.
 
 La comunicación entre el cliente y el servidor debe hacerse SOLO utilizando señales UNIX: `SIGUSR1` y `SIGUSR2`
 
-````markdown
 ### Uso
 
 Para usar el proyecto, primero compila ambos ejecutables con `make`:
@@ -34,8 +33,6 @@ $ ./client [número_del_pid] "Hola, mundo!"
 
 El servidor recibirá el mensaje y lo imprimirá en su terminal.
 
-```
-```
 Fuentes:
   - Señales en UNIX: http://www.inf.udec.cl/~chernand/sc/labs/senales.htm
   - En "server.c" volatile sig_atomic_t   g_char_status;

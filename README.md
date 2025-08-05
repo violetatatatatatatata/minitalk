@@ -33,14 +33,15 @@ $ ./client [número_del_pid] "Hola, mundo!"
 
 El servidor recibirá el mensaje y lo imprimirá en su terminal.
 
-Fuentes:
-  - Señales en UNIX: http://www.inf.udec.cl/~chernand/sc/labs/senales.htm
-  - En "server.c" volatile sig_atomic_t   g_char_status;
-      Clasificador volatil: https://www.ibm.com/docs/es/i/7.5.0?topic=qualifiers-volatile-type-qualifier
-      Estructuras atomicas: https://en.cppreference.com/w/c/program/sig_atomic_t
-  - SIGACTION
-      Struct: https://man7.org/linux/man-pages/man2/sigaction.2.html
-  - Libreria <signals.h>
-      https://pubs.opengroup.org/onlinepubs/7908799/xsh/signal.h.html
-  - Operaciones bit a bit (para la decodificacion del mensaje en server.c)
-      https://learn.microsoft.com/es-es/cpp/c-language/c-bitwise-operators?view=msvc-170
+### Fuentes
+
+- **Señales en UNIX**: [http://www.inf.udec.cl/~chernand/sc/labs/senales.htm](http://www.inf.udec.cl/~chernand/sc/labs/senales.htm)
+- **`volatile sig_atomic_t`** en "server.c"
+  - Calificador `volatile`: [https://www.ibm.com/docs/es/i/7.5.0?topic=qualifiers-volatile-type-qualifier](https://www.ibm.com/docs/es/i/7.5.0?topic=qualifiers-volatile-type-qualifier)
+  - Estructuras atómicas: [https://en.cppreference.com/w/c/program/sig_atomic_t](https://en.cppreference.com/w/c/program/sig_atomic_t)
+- **`SIGACTION`**
+  - `struct`: [https://man7.org/linux/man-pages/man2/sigaction.2.html](https://man7.org/linux/man-pages/man2/sigaction.2.html)
+- **Librería `<signal.h>`**
+  - [https://pubs.opengroup.org/onlinepubs/7908799/xsh/signal.h.html](https://pubs.opengroup.org/onlinepubs/7908799/xsh/signal.h.html)
+- **Operaciones bit a bit** (para la decodificación del mensaje en `server.c`)
+  - [https://learn.microsoft.com/es-es/cpp/c-language/c-bitwise-operators?view=msvc-170](https://learn.microsoft.com/es-es/cpp/c-language/c-bitwise-operators?view=msvc-170)

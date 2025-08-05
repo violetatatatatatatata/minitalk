@@ -6,7 +6,7 @@
 /*   By: avelandr <avelandr@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/07 21:43:56 by avelandr          #+#    #+#             */
-/*   Updated: 2025/07/28 18:59:55 by avelandr         ###   ########.fr       */
+/*   Updated: 2025/08/05 18:00:57 by avelandr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,12 +19,6 @@
    and the client keeps going on
    - Server undestands the character sent, and replies with the number of
    bits sent using SIGUSR1, SIGUSR2
-   Protocolo asincrono
- */
-/*	volatile basically means 'hey compiler' dont do weid shi because this
-	variable changes once the process is recieved:p
-	sig_atomic means that the process (read and write) cant be interrupted
-	global variable assumes two states
  */
 volatile sig_atomic_t	g_server = BUSY;
 
@@ -36,13 +30,19 @@ int	main(int argc, char **argv)
 
 	if (argc != 3)
 	{
-		fputs("Usage = ./goku <PID> \"Message\"\n", stderr);
+		fputs("Usage = ./client <PID> \"Message\"\n", stderr);
 		return (EXIT_FAILURE);
 	}
+	
+	// Guarda el PID del server que se ha introducido como argumento y el mensaje
 	server = ft_atoi(argv[1]);
 	message = argv[2];
-	Signal(SIGUSR1, ack_handler, false);
-	Signal(SIGUSR2, end_handler, false);
+	
+	// Dependiendo de la senyal recibida del hadler, ejecutar una u otra
+	senyal(SIGUSR1, ack_handler, false);
+	senyal(SIGUSR2, end_handler, false);
+	
+	// Mientras el caracter apuntado por i no sea nulo, enviarlo
 	i = 0;
 	while (message[i])
 		send_char(message[i++], server);
@@ -61,9 +61,9 @@ void	send_char(char c, pid_t server)
 	while (bit < CHAR_BIT)
 	{
 		if (c & (0x80 >> bit))
-			Kill(server, SIGUSR1);
+			muelto(server, SIGUSR1);
 		else
-			Kill(server, SIGUSR2);
+			muelto(server, SIGUSR2);
 		bit++;
 		while (g_server == BUSY)
 			usleep(42);

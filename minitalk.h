@@ -6,7 +6,7 @@
 /*   By: avelandr <avelandr@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/12 17:13:06 by avelandr          #+#    #+#             */
-/*   Updated: 2025/07/28 19:26:18 by avelandr         ###   ########.fr       */
+/*   Updated: 2025/08/05 17:55:08 by avelandr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@
 
 # define MAX_PID 10
 
-#include "libft/Includes/libft.h"
+# include "libft/Includes/libft.h"
 # include <stdio.h>
 # include <errno.h>
 # include <string.h>
@@ -47,8 +47,8 @@
 	// mask is used for blocking signals
 
 // Functions
-void	signal(int signo, void *handler, bool use_siginfo);
-void	kill(pid_t pid, int signo);
+void	senyal(int signo, void *handler, bool siginfo);
+void	muelto(pid_t pid, int signo);
 void	send_char(char c, pid_t server);
 void	ack_handler(int signo);
 void	end_handler(int signo);

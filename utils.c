@@ -6,17 +6,37 @@
 /*   By: avelandr <avelandr@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/08 00:20:43 by avelandr          #+#    #+#             */
-/*   Updated: 2025/08/05 18:00:18 by avelandr         ###   ########.fr       */
+/*   Updated: 2025/08/19 14:39:07 by avelandr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minitalk.h"
 
-// wrapper function (it doesnt allow me to put the uppercase lol)
+/* SENYAL
+ *
+ * 1. Recibe el numero de la senal, un puntero al manejador (handler) y un
+ * booleano (siginfo) que determina el tipo de manejador a usar.
+ *
+ * 2. Si siginfo es verdadero, se usa sa_sigaction y se establece la flag
+ * SA_SIGINFO para recibir informacion detallada de la senal.
+ *	  Si es falso, se usa sa_handler.
+ *
+ * 3. La mascara de la estructura se inicializa a vacio con sigemptyset
+ * y luego se le anade SIGUSR1 y SIGUSR2 con sigaddset. Esto bloquea
+ * estas senales mientras el handler se esta ejecutando.
+ *
+ * 4. Finalmente, la funcion sigaction se llama para asociar la senal
+ * con la estructura configurada.
+ *
+ * 5. Se incluye manejo de errores con perror y exit para asegurar
+ * que la llamada a sigaction no falle.
+ */
+
 void	senyal(int signo, void *handler, bool siginfo)
 {
-	struct sigaction	sa = {0};
-	
+	struct sigaction	sa;
+
+	ft_bzero(&sa, sizeof(sa));
 	if (siginfo)
 	{
 		sa.sa_flags = SA_SIGINFO;

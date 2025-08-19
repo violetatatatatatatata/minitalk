@@ -6,7 +6,7 @@
 /*   By: avelandr <avelandr@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/12 17:13:06 by avelandr          #+#    #+#             */
-/*   Updated: 2025/08/05 17:55:08 by avelandr         ###   ########.fr       */
+/*   Updated: 2025/08/19 14:23:48 by avelandr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,5 +53,7 @@ void	send_char(char c, pid_t server);
 void	ack_handler(int signo);
 void	end_handler(int signo);
 void	handler(int signo, siginfo_t *info, void *more_info);
+void	recieved(int *bits_recibidos, int *client, char *c);
+void	esperando_sentado(char *char_to_print);
 
 #endif

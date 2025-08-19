@@ -6,7 +6,7 @@
 /*   By: avelandr <avelandr@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/12 17:07:47 by avelandr          #+#    #+#             */
-/*   Updated: 2025/08/05 17:57:05 by avelandr         ###   ########.fr       */
+/*   Updated: 2025/08/19 14:30:55 by avelandr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,118 +46,124 @@
 
 volatile sig_atomic_t	g_char_status = BUSY;
 
-/* STRUCT SIGACTION
-           struct sigaction {
-               void     (*sa_handler)(int);	// especifica la accion a ser asociada a signum (SIG_DFL - SIG_IGN - a pointer to a signal)
-               void     (*sa_sigaction)(int, siginfo_t *, void *);
-               sigset_t   sa_mask;
-               int        sa_flags;
-               void     (*sa_restorer)(void);
-           };
-	- PID: identificador unico de proceso, permite que el SO dirija la signal del client al proceso que lleva el server
-*/
+/* SERVER
+ *
+ * 1. La funcion utiliza la estructura sigaction para especificar el
+ * comportamiento del manejador de senales.
+ *
+ * 2. Se configuran las siguientes banderas:
+ * - SA_SIGINFO: Permite que el manejador reciba mas informacion de la senal,
+ * como el PID del emisor, a traves del campo sa_sigaction.
+ * - SA_RESTART: Intenta reiniciar automaticamente las llamadas al sistema
+ * interrumpidas por una senal.
+ *
+ * 3. Se asigna la direccion del manejador a sa_sigaction.
+ *
+ * 4. La mascara de senales sa_mask se inicializa vacia con sigemptyset y
+ * luego se anaden SIGUSR1 y SIGUSR2 para bloquear temporalmente otras
+ * senales mientras el manejador se esta ejecutando, evitando interrupciones.
+ *
+ * 5. La funcion sigaction se llama para asociar la senal deseada con la
+ * estructura configurada. El tercer argumento es nulo porque no se necesita
+ * la configuracion anterior.
+ *
+ * 6. El proceso principal entra en pause, deteniendose y no consumiendo
+ * recursos de CPU hasta que una de las senales SIGUSR1 o SIGUSR2 sea
+ * recibida y el manejador se ejecute.
+ */
 
 int	main(void)
 {
 	struct sigaction	sa;
 	char				char_to_print;
-	
-	// Imprimir el PID
+
 	ft_printf("PID: %d\n", getpid());
 	ft_bzero(&sa, sizeof(sa));
-	
-	// La flag SIGINFO indica que se usara el campo sa_sigaction en lugar de sa_handler de modo que el handler tenga mas informacion de la signal tal como el PID del receptor
-	// SA_RESTART indica que de interrumpirse una llamada al sistema (como read o write) el SO debe intentar reiniciar la llamada automaticamente
-	// El operador OR indica al handler que adquiera dos comportamientos: SA_SIGINFO (recibir informacion detallada de la signal y SA_RESTART (reiniciar llamadas al sistema interrumpidas)
 	sa.sa_flags = SA_SIGINFO | SA_RESTART;
-
-	// Se asigna la direccion de handler al campo sa_sigaction para indicar que esa sera la funcion que procese la signal recibida
 	sa.sa_sigaction = handler;
-
-	// Esta linea inicializa un conjunto de signals vacia para el campo sa_mask. Este campo define que signals han de ser bloqueadas mientras el handler se esta ejecutando. Esta ejecucion permite que por defecto ninguna signal este bloqueada
 	sigemptyset(&sa.sa_mask);
-
-	// La funcion sigaddset agrega la signal al conjunto apuntado por set recien inicializado
-	// Esta ejecucion permite que cualquier otra signal SIGUSR1 o SIGUSR2 queden bloqueadas temporalmente mientras se ejecuta el handler
 	sigaddset(&sa.sa_mask, SIGUSR1);
 	sigaddset(&sa.sa_mask, SIGUSR2);
-
-	// int sigaction(int signum, const struct sigaction *act, struct sigaction *oldact);
-	// Indica que una vez reciba la senyal definida en el campo signum, debe usar la estructura sa para manejarla. El tercer argumento es nulo pues no hay oldact
 	sigaction(SIGUSR1, &sa, NULL);
 	sigaction(SIGUSR2, &sa, NULL);
 	while (1)
-	{
-		// El proceso se detiene y no consume recursos de CPU hasta recibir SIGUSR1/R2, y es entonces donde el handler se ejecuta 
-		pause();
-
-		// Comprueba si la variable global ha cambiado su valor inicial (es modificada en handler)
-		if (g_char_status != 0)
-		{
-			// De haber cambiado, significa que ha recibido la senyal
-			if (g_char_status == 1)
-				ft_printf("\n");
-			
-			// En caso de no ser 0 ni 1, significa que es un caracter codificado
-			else
-			{
-				char_to_print = (char)(g_char_status - 2);
-				ft_printf("%c", char_to_print);
-			}
-			g_char_status = 0;
-		}
-	}
+		esperando_sentado(&char_to_print);
 	ft_printf("\n");
 	return (0);
 }
 
-/*	DECODIFICA LOS BITS  
-	signo: tipo de senyal recibida (SIGUSR1 / SIGUSR2)
-	siginfo_t info: esta estructura permite acceder al informacion detallada de la senyal (para esto se ha admitido SIGINFO)
-	moreinfo no se usa pero tampoco se puede prescindir pq sigaction se queja :p
-*/
+void	esperando_sentado(char *char_to_print)
+{
+	pause();
+	if (g_char_status != 0)
+	{
+		if (g_char_status == 1)
+			ft_printf("\n");
+		else
+		{
+			*char_to_print = g_char_status - 2;
+			ft_printf("%c", *char_to_print);
+		}
+		g_char_status = 0;
+	}
+}
+
+/* ALGORITMO DE DECODIFICACION
+ *
+ * 1. La función decodifica los bits del cliente a partir de la señal
+ * recibida (signo): SIGUSR1 o SIGUSR2.
+ *
+ * 2. siginfo_t info da acceso a información detallada, como el PID
+ * del cliente emisor. El parámetro moreinfo es requerido por
+ * sigaction, aunque no se use en esta función (o la funcion se queja :p)
+ *
+ * 3. Si es la primera señal, se guarda el PID del cliente de la estructura
+ * info para que el servidor sepa a quién responder.
+ *
+ * 4. Lógica de bits:
+ * - SIGUSR1: El bit correspondiente se establece a 1 sin modificar
+ * los bits ya decodificados. Se logra con un desplazamiento de bits
+ * (>>) y una operación OR.
+ * - SIGUSR2: Niega el bit correspondiente. Se logra con una operación
+ * de negación lógica o NAND.
+ *
+ * 5. Una vez procesado el bit, el servidor envía SIGUSR1 al cliente como
+ * ACK (confirmación) usando la función kill().
+ *
+ * 6. El contador de bits se incrementa y se reinicia al llegar a 8,
+ * completando la decodificación de un byte (char).
+ */
+
 void	handler(int signo, siginfo_t *info, void *more_info)
 {
 	static char		c = 0;
 	static int		bits_recibidos = 0;
-	static pid_t	client = 0;		// Almacena el PID del cliente que envia senyales
+	static pid_t	client = 0;
 
 	(void)more_info;
-	// Si es la primera senyal que recibe del cliente y existe la estructura, guarda el PID de cliente de modo que el servidor sepa a quien responder
 	if (client == 0 && info->si_pid)
 		client = info->si_pid;
-
-	// (el operador >> desplaza bits_recibidos veces el bit a la derecha y el operador OR ejecuta dicha operacion sobre el bit desplazado)
-	/* SIRGUSR1
-		El objetivo es establecer el bit corespondiente a c a 1 sin modificar los bits ya decodificados
-		Esta operacion establece a 1 el bit apuntado por bits_recibidos
-	*/
 	if (signo == SIGUSR1)
 		c = c | (0b10000000 >> bits_recibidos);
 	else if (SIGUSR2 == signo)
-	/* SIGUSR2
-		NAND niega todos los bit y mantiene el mas significativo
-	*/
 		c &= ~(0b10000000 >> bits_recibidos);
 	bits_recibidos++;
-
-	// Una vez procesado el bit, el servidor envia SIGUSR1 al cliente a modo de ACK (la funcion kill() envia dicha senyal al proceso senyalado por el pid de client)
 	if (client != 0)
 		muelto(client, SIGUSR1);
-	
-	// Si ya se han recibido los 8 bits (el tamanyo de un byte de char) se reinicia el contador
 	if (bits_recibidos == CHAR_BIT)
+		recieved(&bits_recibidos, &client, &c);
+}
+
+void	recieved(int *bits_recibidos, int *client, char *c)
+{
+	*bits_recibidos = 0;
+	if (*c == '\0')
 	{
-		bits_recibidos = 0;
-		if (c == '\0')
-		{
-			g_char_status = 1;
-			muelto(client, SIGUSR2);
-			client = 0;
-		}
-		else
-			// Si el caracter no es nulo se suma dos porque las posiciones 0 y 1 estan reservadas
-			g_char_status = (int)c + 2;
-		c = 0;
+		g_char_status = 1;
+		muelto(*client, SIGUSR2);
+		*client = 0;
 	}
+	else
+		g_char_status = (int)*c + 2;
+	*c = 0;
 }

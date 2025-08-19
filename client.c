@@ -6,19 +6,26 @@
 /*   By: avelandr <avelandr@student.42barcelon      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/07 21:43:56 by avelandr          #+#    #+#             */
-/*   Updated: 2025/08/05 18:00:57 by avelandr         ###   ########.fr       */
+/*   Updated: 2025/08/19 14:48:32 by avelandr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minitalk.h"
 
-/*
-   - When a char is sended, its signal is sended bit by bit
-   - Each bit is sended from the most signfical to the least significal one
-   - The client sends the fist bit, waits for the server to send an ACK,
-   and the client keeps going on
-   - Server undestands the character sent, and replies with the number of
-   bits sent using SIGUSR1, SIGUSR2
+/* Flujo de Comunicación Cliente-Servidor
+ *
+ * - La comunicación envía un carácter, bit a bit, desde el cliente al servidor.
+ * - Cada bit se envía en orden, del más significativo al menos significativo.
+ * - El cliente envía el primer bit, espera una confirmación (ACK) del servidor y
+ * continúa con el siguiente.
+ * - El servidor, una vez que ha decodificado un bit, confirma la recepción
+ * enviando una señal (ACK) al cliente.
+ *
+ * Cliente:
+ * - Almacena el PID del servidor y el mensaje del argumento.
+ * - Utiliza un manejador de señales para gestionar las respuestas del servidor.
+ * - Recorre el mensaje, enviando cada carácter (incluyendo el nulo '\0') al
+ * servidor, bit a bit, hasta que el mensaje completo ha sido transmitido.
  */
 volatile sig_atomic_t	g_server = BUSY;
 
@@ -33,16 +40,10 @@ int	main(int argc, char **argv)
 		fputs("Usage = ./client <PID> \"Message\"\n", stderr);
 		return (EXIT_FAILURE);
 	}
-	
-	// Guarda el PID del server que se ha introducido como argumento y el mensaje
 	server = ft_atoi(argv[1]);
 	message = argv[2];
-	
-	// Dependiendo de la senyal recibida del hadler, ejecutar una u otra
 	senyal(SIGUSR1, ack_handler, false);
 	senyal(SIGUSR2, end_handler, false);
-	
-	// Mientras el caracter apuntado por i no sea nulo, enviarlo
 	i = 0;
 	while (message[i])
 		send_char(message[i++], server);

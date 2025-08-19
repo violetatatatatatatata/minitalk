@@ -1,0 +1,14 @@
+. En el Servidor (g_char_status)
+Propósito: La variable g_char_status es un mecanismo de comunicación para el servidor. Permite que la función handler, que es asíncrona y se ejecuta cuando llega una señal, informe a la función principal (main) sobre el estado de la recepción de un carácter. El main del servidor entra en un bucle infinito que se detiene con pause() para no consumir CPU. El código que imprime los caracteres recibidos está en una función separada que es llamada desde el main (esperando_sentado). Para que esta función sepa cuándo se ha recibido un carácter completo, la función handler (que no puede comunicarse directamente con main porque se ejecuta de forma asíncrona) actualiza la variable global g_char_status.
+
+g_char_status = 1 indica que se recibió el carácter nulo (\0), lo que significa el final del mensaje.
+
+g_char_status = (int)c + 2 se utiliza para pasar el valor ASCII del carácter a la función esperando_sentado. Se le suma 2 para evitar conflictos con los estados 0 (no hay carácter listo) y 1 (fin de mensaje).
+
+2. En el Cliente (g_server)
+
+Propósito: La variable g_server se utiliza para implementar el protocolo Stop-and-Wait. Esta variable permite al cliente saber si el servidor está listo para recibir el siguiente bit. El cliente debe esperar una confirmación (ACK) del servidor después de enviar cada bit del mensaje. Esta variable global actúa como una bandera que el handler del cliente actualiza cuando recibe una señal de confirmación (SIGUSR1) del servidor.
+
+La variable se inicializa en BUSY (0).
+
+Después de que el cliente envía un bit, entra en un bucle que espera a que g_server cambie a READY (1). El ack_handler del cliente cambia el estado de g_server a READY cuando recibe la señal de confirmación del servidor. Esto desbloquea el bucle y permite que se envíe el siguiente bit.
